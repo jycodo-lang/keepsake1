@@ -1,0 +1,999 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>The Keepsake Initiative</title>
+  <meta name="description" content="The Keepsake Initiative brings joy, creativity, and comfort to children facing chronic or life-threatening illnesses through music, storytelling, and meaningful keepsakes." />
+
+  <style>
+    :root{
+      /* Light, modern nonprofit look */
+      --bg: #F6F7FB;
+      --bg2:#FFFFFF;
+      --surface: rgba(255,255,255,0.88);
+      --surface2: rgba(255,255,255,0.94);
+      --stroke: rgba(15,23,42,0.12);
+      --text: rgba(15,23,42,0.92);
+      --muted: rgba(15,23,42,0.70);
+      --muted2: rgba(15,23,42,0.55);
+
+      --accent:#4F46E5;   /* indigo */
+      --accent2:#06B6D4;  /* cyan */
+      --ok:#16A34A;
+      --warn:#F59E0B;
+      --danger:#E11D48;
+
+      --radius: 18px;
+      --shadow: 0 14px 40px rgba(2,6,23,0.10);
+      --shadow2: 0 10px 24px rgba(2,6,23,0.08);
+      --max: 1140px;
+
+      --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: var(--font);
+      color: var(--text);
+      background:
+        radial-gradient(900px 520px at 10% 0%, rgba(79,70,229,0.10), transparent 60%),
+        radial-gradient(800px 520px at 90% 20%, rgba(6,182,212,0.10), transparent 55%),
+        linear-gradient(180deg, var(--bg2), var(--bg));
+      overflow-x:hidden;
+    }
+
+    a{color: var(--accent); text-decoration:none}
+    a:hover{text-decoration:underline; text-underline-offset:3px}
+
+    .container{ width:min(var(--max), calc(100% - 32px)); margin:0 auto; }
+
+    .skip-link{ position:absolute; left:-999px; top:auto; width:1px; height:1px; overflow:hidden; }
+    .skip-link:focus{
+      left:16px; top:12px; width:auto; height:auto;
+      padding:10px 12px; border-radius:12px;
+      background: #111827; color:#fff;
+      z-index:9999;
+    }
+
+    header.nav{
+      position:sticky; top:0; z-index:50;
+      background: rgba(255,255,255,0.75);
+      border-bottom: 1px solid var(--stroke);
+      backdrop-filter: blur(12px);
+    }
+    .nav-inner{
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 14px 0; gap:14px;
+    }
+
+    .brand{
+      display:flex; align-items:center; gap:12px;
+      color: var(--text); text-decoration:none;
+      min-width: 260px;
+    }
+    .brand img{
+      width:44px; height:44px; border-radius:14px;
+      border: 1px solid var(--stroke);
+      box-shadow: var(--shadow2);
+      background: white;
+      object-fit: cover;
+    }
+    .brand-title{ font-weight: 900; letter-spacing:-0.2px; line-height:1.1; }
+    .brand-sub{ color: var(--muted2); font-size: 12.5px; margin-top:2px; }
+
+    nav.links{
+      display:flex; gap:16px; flex-wrap:wrap;
+      align-items:center; justify-content:flex-end;
+    }
+    nav.links a{
+      color: var(--muted);
+      font-weight: 800;
+      padding: 6px 0;
+      border-bottom: 2px solid transparent; /* makes active state clear without looking like a button */
+      white-space:nowrap;
+    }
+    nav.links a.active{
+      color: var(--text);
+      border-bottom-color: rgba(79,70,229,0.35);
+    }
+
+    .nav-actions{ display:flex; gap:10px; align-items:center; }
+
+    /* Buttons: only CTAs look like buttons */
+    .btn{
+      border:1px solid var(--stroke);
+      background: white;
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 14px;
+      cursor:pointer;
+      font-weight: 900;
+      box-shadow: var(--shadow2);
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+    }
+    .btn:hover{ transform: translateY(-1px); }
+    .btn:active{ transform: translateY(0px); }
+
+    .btn.primary{
+      border-color: rgba(79,70,229,0.22);
+      background: linear-gradient(135deg, rgba(79,70,229,0.95), rgba(6,182,212,0.70));
+      color: #0B1020;
+      box-shadow: 0 16px 32px rgba(79,70,229,0.18);
+    }
+    .btn.ghost{
+      background: rgba(255,255,255,0.80);
+      box-shadow:none;
+    }
+
+    main{ padding: 26px 0 0; }
+
+    .page{ display:none; }
+    .page.active{ display:block; }
+
+    .hero{ padding: 18px 0 10px; }
+    .hero-grid{
+      display:grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 16px;
+      align-items: stretch;
+    }
+    @media (max-width: 980px){
+      .hero-grid{ grid-template-columns: 1fr; }
+      .brand-sub{ display:none; }
+      nav.links{ gap:12px; }
+    }
+
+    .card{
+      background: var(--surface);
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .card.pad{ padding: 18px; }
+    .card.white{ background: var(--surface2); }
+
+    h1{
+      margin:0 0 10px;
+      font-size: clamp(28px, 3.6vw, 44px);
+      line-height: 1.08;
+      letter-spacing: -0.6px;
+    }
+    h2{
+      margin:0 0 8px;
+      font-size: 20px;
+      letter-spacing:-0.2px;
+    }
+    h3{
+      margin:0 0 6px;
+      font-size: 16px;
+      letter-spacing:-0.1px;
+    }
+    p{
+      margin: 0 0 10px;
+      color: var(--muted);
+      line-height:1.65;
+      font-size: 16px;
+    }
+    .lead{ font-size: 16.5px; }
+
+    .meta{
+      display:flex; gap:10px; flex-wrap:wrap;
+      margin-top: 10px;
+    }
+    .tag{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(79,70,229,0.06);
+      border: 1px solid rgba(79,70,229,0.16);
+      color: rgba(15,23,42,0.80);
+      font-weight: 900;
+      font-size: 13px;
+    }
+
+    .grid3{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 14px;
+    }
+    @media (max-width: 900px){ .grid3{ grid-template-columns:1fr; } }
+
+    .info{
+      padding: 14px;
+      border-radius: 16px;
+      border: 1px solid var(--stroke);
+      background: rgba(255,255,255,0.70);
+      box-shadow: var(--shadow2);
+    }
+    .info p{ margin:0; }
+
+    .two{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      align-items:start;
+      margin-top: 12px;
+    }
+    @media (max-width: 900px){ .two{ grid-template-columns:1fr; } }
+
+    hr.sep{
+      border:none; height:1px;
+      background: var(--stroke);
+      margin: 14px 0;
+    }
+
+    .note{
+      padding: 12px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(15,23,42,0.10);
+      background: rgba(255,255,255,0.82);
+      color: rgba(15,23,42,0.72);
+      line-height:1.55;
+      font-size: 14px;
+    }
+    .note strong{ color: rgba(15,23,42,0.90); }
+
+    .badge-warn{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(245,158,11,0.35);
+      background: rgba(245,158,11,0.10);
+      color: rgba(15,23,42,0.82);
+      font-weight: 900;
+      font-size: 13px;
+    }
+
+    /* Forms */
+    form{ display:grid; gap: 10px; }
+    label{
+      font-weight: 900;
+      font-size: 13px;
+      color: rgba(15,23,42,0.85);
+      display:block;
+      margin-bottom: 6px;
+    }
+    input, textarea, select{
+      width:100%;
+      padding: 11px 12px;
+      border-radius: 14px;
+      border: 1px solid var(--stroke);
+      background: rgba(255,255,255,0.92);
+      outline:none;
+      color: var(--text);
+      font-size: 15px;
+    }
+    textarea{ min-height: 120px; resize: vertical; }
+
+    .row{
+      display:grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    }
+    @media (max-width: 700px){ .row{ grid-template-columns:1fr; } }
+
+    .footer{
+      margin-top: 28px;
+      padding: 22px 0 36px;
+      border-top: 1px solid var(--stroke);
+      color: var(--muted2);
+      font-size: 14px;
+    }
+
+    .toast{
+      position: fixed;
+      bottom: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(15,23,42,0.92);
+      color: white;
+      padding: 12px 14px;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      display:none;
+      max-width: min(600px, calc(100% - 24px));
+      z-index: 999;
+    }
+
+    /* accessibility toggles */
+    body.high-contrast{
+      --bg:#FFFFFF;
+      --surface: rgba(255,255,255,0.96);
+      --surface2: rgba(255,255,255,0.98);
+      --stroke: rgba(15,23,42,0.20);
+      --muted: rgba(15,23,42,0.88);
+      --muted2: rgba(15,23,42,0.76);
+    }
+    body.readable{
+      font-family: ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      letter-spacing: 0.2px;
+    }
+  </style>
+</head>
+
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="#" data-go="home" aria-label="The Keepsake Initiative home">
+      <!-- Embedded logo (single-file) -->
+      <img alt="The Keepsake Initiative logo"
+           src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABVUAAAgACAYAAAAmDtM7AAAQAElEQVR4AezdCbxlaVnf++d519rTmceaunpmkkFUBMSoOCZE4wDaggxdnfv5aBJzvUmMJtch
+...SNIPPED_FOR_DISPLAY...
+" />
+      <div>
+        <div class="brand-title">The Keepsake Initiative</div>
+        <div class="brand-sub">Joy visits • Custom songs • Keepsake stories</div>
+      </div>
+    </a>
+
+    <nav class="links" aria-label="Primary">
+      <a href="#home" data-go="home">Home</a>
+      <a href="#about" data-go="about">About</a>
+      <a href="#keepsakes" data-go="keepsakes">Keepsakes</a>
+      <a href="#donate" data-go="donate">Donate</a>
+      <a href="#chapter" data-go="chapter">Start a Chapter</a>
+      <a href="#resources" data-go="resources">Resources</a>
+      <a href="#testimonials" data-go="testimonials">Testimonials</a>
+      <a href="#contact" data-go="contact">Contact</a>
+      <a href="#request" data-go="request">Request</a>
+    </nav>
+
+    <div class="nav-actions">
+      <button class="btn ghost" id="toggle-contrast" type="button">Contrast</button>
+      <button class="btn ghost" id="toggle-readable" type="button">Readable</button>
+      <button class="btn primary" type="button" data-go="donate">Donate</button>
+    </div>
+  </div>
+</header>
+
+<main id="main" class="container">
+
+  <!-- HOME -->
+  <section class="page active" id="page-home" aria-labelledby="home-title">
+    <div class="hero">
+      <div class="hero-grid">
+        <div class="card pad white">
+          <h1 id="home-title">Joy that lasts forever.</h1>
+          <p class="lead">
+            The Keepsake Initiative brings joy, creativity, and comfort to children facing chronic or life-threatening illnesses.
+            Through music, storytelling, and meaningful experiences, we create personalized keepsakes families can treasure forever.
+          </p>
+
+          <div class="meta">
+            <span class="tag">🎵 Custom songs</span>
+            <span class="tag">📚 Short stories</span>
+            <span class="tag">🧸 Hospital joy visits</span>
+            <span class="tag">🕊️ Keepsakes for families</span>
+          </div>
+
+          <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:16px;">
+            <button class="btn primary" type="button" data-go="request">Request for a Child</button>
+            <button class="btn" type="button" data-go="about">Learn more</button>
+          </div>
+
+          <hr class="sep" />
+
+          <div class="note">
+            <strong>What we do:</strong> we coordinate hospital visits (with permission), bring toys/books/music,
+            write custom songs & stories for each child, and preserve them as keepsakes for families.
+          </div>
+        </div>
+
+        <aside class="card pad">
+          <div class="badge-warn">Quick overview</div>
+          <h2 style="margin-top:10px;">A simple 3-step model</h2>
+          <p>
+            We bring a positive, engaging moment into a hospital room — then transform it into a keepsake that can be revisited
+            long after that day ends.
+          </p>
+
+          <div class="grid3" style="grid-template-columns:1fr; margin-top:12px;">
+            <div class="info">
+              <h3>1) Joy Visit</h3>
+              <p>Toys, books, songs, and interactive activities (with permission).</p>
+            </div>
+            <div class="info">
+              <h3>2) Personalized Creation</h3>
+              <p>Custom song + story based on a child’s journey, personality, and dreams.</p>
+            </div>
+            <div class="info">
+              <h3>3) The Keepsake</h3>
+              <p>Recorded/preserved for the family, with optional consent-based sharing later.</p>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;">
+            <button class="btn primary" type="button" data-go="donate">Fund a keepsake</button>
+            <button class="btn" type="button" data-go="chapter">Start a chapter</button>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="page" id="page-about" aria-labelledby="about-title">
+    <div class="hero">
+      <div class="card pad white">
+        <h1 id="about-title">About The Keepsake Initiative</h1>
+        <p class="lead">
+          The Keepsake Initiative began with one simple belief: <strong>Hospitals can be places of hope.</strong>
+          Founded by students who experienced hospital life firsthand, we bring music, storytelling, and human connection
+          to children facing long-term medical challenges.
+        </p>
+
+        <div class="two">
+          <div class="card pad">
+            <h2>Our mission</h2>
+            <p>
+              We bring joy, creativity, and comfort to children facing chronic or life-threatening illnesses.
+              Through music, storytelling, and meaningful experiences, we create personalized keepsakes that families can treasure forever.
+            </p>
+          </div>
+
+          <div class="card pad">
+            <h2>What we are not</h2>
+            <p>
+              We are not a wish-granting organization like Make-A-Wish. We do not replace clinical child life services.
+              We partner with hospitals and child life departments to create uplifting experiences.
+            </p>
+          </div>
+        </div>
+
+        <hr class="sep" />
+
+        <h2>Founder’s Statement (Ruhani)</h2>
+        <div class="note">
+          When I was 7, I fell unconscious on a trip to the hospital for what we thought was simply a really bad flu, and woke up days later with a tube in my throat and beeping machines surrounding me…<br/><br/>
+          Years later, my memories of the hospital seem incomplete. Because I don’t remember my strength. I don’t remember my bravery…<br/><br/>
+          That’s why I created The Keepsake Initiative. We make personal short stories, poems, and songs to celebrate resilience and bravery. We cannot cure illness. But we can ease loneliness. We can honor bravery. We can create something that lasts. And sometimes, that is enough.
+        </div>
+
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;">
+          <button class="btn primary" type="button" data-go="request">Request a keepsake</button>
+          <button class="btn" type="button" data-go="donate">Donate</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- KEEPSAKES -->
+  <section class="page" id="page-keepsakes" aria-labelledby="keepsakes-title">
+    <div class="hero">
+      <div class="card pad white">
+        <h1 id="keepsakes-title">Our Keepsakes</h1>
+        <p class="lead">
+          Each keepsake is written personally for a child — based on their interests, strengths, and struggles —
+          and delivered as a printed story + recorded song. With family permission, some keepsakes may be archived
+          to spread awareness.
+        </p>
+
+        <div class="badge-warn">Coming Soon</div>
+        <p style="margin-top:10px;">
+          This page will include:
+          <br/>• Audio Library (songs)
+          <br/>• Story Gallery (PDF or visual pages)
+          <br/>• “In Their Words” (family quotes, with consent)
+          <br/>• Educational note about conditions (only if approved)
+        </p>
+
+        <div class="note">
+          <strong>Consent rule:</strong> written parental consent is required before anything is shared publicly.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DONATE -->
+  <section class="page" id="page-donate" aria-labelledby="donate-title">
+    <div class="hero">
+      <div class="card pad white">
+        <h1 id="donate-title">Donate</h1>
+        <p class="lead">
+          Every child deserves joy. Every family deserves something to hold onto.
+          Your donation supports books, toys, supplies, recording quality, hospital activity days, chapter expansion,
+          and nonprofit operational costs.
+        </p>
+
+        <div class="two">
+          <div class="card pad">
+            <h2>Donate with Stripe</h2>
+            <p>
+              Stripe supports card payments including <strong>Visa</strong>.
+              Use the buttons below once you paste your Stripe links in the CONFIG section.
+            </p>
+
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <a id="donate-once" class="btn primary" href="#" role="button">Donate (One-Time)</a>
+              <a id="donate-monthly" class="btn" href="#" role="button">Donate (Monthly)</a>
+            </div>
+
+            <div id="donate-status" class="note" style="margin-top:10px;"></div>
+          </div>
+
+          <div class="card pad">
+            <h2>Donation tiers</h2>
+            <div class="note">
+              <strong>$15</strong> – Supplies for one child’s activity day<br/>
+              <strong>$50</strong> – Materials for a custom keepsake<br/>
+              <strong>$150</strong> – Covers a full visit kit<br/>
+              <strong>$500+</strong> – Sponsors a hospital visit day
+            </div>
+
+            <div class="note" style="margin-top:10px;">
+              <strong>Call to action:</strong> Help us create joy that lasts forever.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- START A CHAPTER -->
+  <section class="page" id="page-chapter" aria-labelledby="chapter-title">
+    <div class="hero">
+      <div class="card pad white">
+        <h1 id="chapter-title">Start a Keepsake Chapter</h1>
+        <p class="lead">
+          We are expanding nationally through student-led chapters.
+          Chapters help fundraise locally, create songs/stories, and spread awareness.
+        </p>
+
+        <div class="two">
+          <div class="card pad">
+            <h2>Chapter requirements</h2>
+            <div class="note">
+              • 1 faculty advisor<br/>
+              • 5–10 student members minimum<br/>
+              • Fundraising commitment<br/>
+              • Virtual training session<br/>
+              • Hospital partnership outreach (guided by national board)
+            </div>
+          </div>
+
+          <div class="card pad">
+            <h2>Chapter responsibilities</h2>
+            <div class="note">
+              • Fundraise locally<br/>
+              • Write songs/stories<br/>
+              • Coordinate approved visits<br/>
+              • Run awareness campaigns<br/>
+              • Submit impact reports
+            </div>
+          </div>
+        </div>
+
+        <hr class="sep" />
+
+        <h2>Why start a chapter?</h2>
+        <div class="grid3">
+          <div class="info"><h3>Leadership</h3><p>Real responsibility with real outcomes.</p></div>
+          <div class="info"><h3>Creative service</h3><p>Use music and writing to support families.</p></div>
+          <div class="info"><h3>Impact</h3><p>Directly improve the hospital experience for kids.</p></div>
+        </div>
+
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;">
+          <button class="btn primary" type="button" data-go="contact">Contact to start a chapter</button>
+          <button class="btn" type="button" data-go="donate">Donate</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESOURCES -->
+  <section class="page" id="page-resources" aria-labelledby="resources-title">
+    <div class="hero">
+      <div class="card pad white">
+        <h1 id="resources-title">Resources: Child Life</h1>
+        <p class="lead">
+          Child life specialists are trained professionals who support children and families during medical experiences.
+          The Keepsake Initiative complements child life services through creative legacy-building and joyful engagement.
+        </p>
+
+        <div class="two">
+          <div class="card pad">
+            <h2>What child life specialists do</h2>
+            <div class="note">
+              • Coping strategies<br/>
+              • Medical play and preparation<br/>
+              • Emotional support<br/>
+              • Family communication<br/>
+              • Developmentally appropriate explanations
+            </div>
+          </div>
+
+          <div class="card pad">
+            <h2>Why it matters</h2>
+            <div class="note">
+              Children in hospitals can face fear, isolation, loss of normal routines, and emotional stress alongside medical challenges.
+              Creative expression can improve emotional regulation, identity, resilience, and family memory-making.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="page" id="page-testimonials" aria-labelledby="testimonials-title">
+    <div class="hero">
+      <div class="card pad white">
+        <h1 id="testimonials-title">Testimonials</h1>
+        <p class="lead">
+          “In Their Words” — quotes from families (with consent).
+        </p>
+        <div class="badge-warn">Coming Soon</div>
+        <div class="note" style="margin-top:10px;">
+          This page will feature family quotes and impact reflections, only with written consent.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="page" id="page-contact" aria-labelledby="contact-title">
+    <div class="hero">
+      <div class="card pad white">
+        <h1 id="contact-title">Contact Us</h1>
+        <p class="lead">
+          For hospital partnerships, families interested in a keepsake, schools wanting to start a chapter, or anyone who wants to learn more.
+        </p>
+
+        <div class="two">
+          <form id="contact-form" class="card pad">
+            <input type="hidden" name="form_type" value="Contact Form" />
+            <div class="row">
+              <div>
+                <label>Your name</label>
+                <input name="name" placeholder="Your name" required />
+              </div>
+              <div>
+                <label>Your email</label>
+                <input name="email" placeholder="you@email.com" required />
+              </div>
+            </div>
+
+            <div class="row">
+              <div>
+                <label>I’m reaching out as…</label>
+                <select name="role">
+                  <option>Parent / Guardian</option>
+                  <option>Hospital staff</option>
+                  <option>Sponsor / Donor</option>
+                  <option>Volunteer (music / writing / visits)</option>
+                  <option>Press / Media</option>
+                  <option>Other</option>
+                </select>
+              </div>
+              <div>
+                <label>Preferred contact method</label>
+                <select name="contact_method">
+                  <option>Email</option>
+                  <option>Phone (add in message)</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label>Message</label>
+              <textarea name="message" placeholder="Tell us what you need or how you'd like to help." required></textarea>
+            </div>
+
+            <button class="btn primary" type="submit">Send message</button>
+            <div id="contact-result" class="note" style="margin-top:10px;"></div>
+
+            <div class="note">
+              <strong>Response time:</strong> typically within 3–5 business days.
+            </div>
+          </form>
+
+          <div class="card pad">
+            <h2>Quick contacts</h2>
+            <div class="note">
+              <strong>General email:</strong> jycodo@gmail.com<br/>
+              <strong>Social media:</strong> (add when ready)
+            </div>
+            <hr class="sep" />
+            <div class="note">
+              <strong>Board page:</strong> When your board is finalized, you can add photos + short bios on the About page.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REQUEST -->
+  <section class="page" id="page-request" aria-labelledby="request-title">
+    <div class="hero">
+      <div class="card pad white">
+        <h1 id="request-title">Request for a Child</h1>
+        <p class="lead">
+          Request a joy visit, a custom story, a custom song, or both. We coordinate through guardians and staff as needed.
+        </p>
+
+        <div class="two">
+          <form id="request-form" class="card pad">
+            <input type="hidden" name="form_type" value="Request Form" />
+            <div class="row">
+              <div>
+                <label>Parent/Guardian name</label>
+                <input name="guardian_name" placeholder="Your full name" required />
+              </div>
+              <div>
+                <label>Email</label>
+                <input name="email" placeholder="you@email.com" required />
+              </div>
+            </div>
+
+            <div class="row">
+              <div>
+                <label>Child’s first name</label>
+                <input name="child_name" placeholder="e.g., Maya" required />
+              </div>
+              <div>
+                <label>Age (optional)</label>
+                <input name="age" type="number" min="0" max="21" placeholder="8" />
+              </div>
+            </div>
+
+            <div class="row">
+              <div>
+                <label>Hospital / City (optional)</label>
+                <input name="hospital_city" placeholder="Hospital name or city" />
+              </div>
+              <div>
+                <label>Request type</label>
+                <select name="request_type">
+                  <option>Joy visit + toys/books/music</option>
+                  <option>Custom keepsake story</option>
+                  <option>Custom keepsake song</option>
+                  <option>Both story + song keepsake</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label>Favorite things (optional)</label>
+              <input name="favorites" placeholder="e.g., superheroes, cats, piano, drawing" />
+            </div>
+
+            <div>
+              <label>One thing they’ve always wanted to do (optional)</label>
+              <input name="wish" placeholder="e.g., meet a musician, see a zoo animal, have a small party" />
+            </div>
+
+            <div>
+              <label>Details you want reflected (simple wording)</label>
+              <textarea name="details" placeholder="What should the story/song honor about them?"></textarea>
+            </div>
+
+            <div class="row">
+              <div>
+                <label>Permission to share publicly?</label>
+                <select name="permission_share">
+                  <option>No (private keepsake only)</option>
+                  <option>Maybe (ask me later)</option>
+                  <option>Yes (share anonymized)</option>
+                </select>
+              </div>
+              <div>
+                <label>Best time to contact (optional)</label>
+                <input name="contact_time" placeholder="e.g., evenings after 6pm" />
+              </div>
+            </div>
+
+            <button class="btn primary" type="submit">Submit request</button>
+            <div id="request-result" class="note" style="margin-top:10px;"></div>
+          </form>
+
+          <div class="card pad">
+            <h2>What happens next</h2>
+            <div class="note">
+              <strong>1) Confirm details</strong> — we contact the guardian and clarify what’s needed.<br/><br/>
+              <strong>2) Plan the moment</strong> — toys/books/music matched to interests when possible.<br/><br/>
+              <strong>3) Create the keepsake</strong> — song + story preserved for the family.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <div class="container">
+    © <span id="year"></span> The Keepsake Initiative • Built as a single-file site (Stripe + EmailJS ready)
+  </div>
+</footer>
+
+<div class="toast" role="status" aria-live="polite"></div>
+
+<!-- EmailJS (needed for forms to email you) -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+<script>
+(() => {
+  /* =========================================================
+     CONFIG (YOU MUST FILL THESE 4 LINES TO GO LIVE)
+     ========================================================= */
+  const CONFIG = {
+    // Stripe Payment Links (create in Stripe → Payment Links)
+    STRIPE_DONATE_ONCE_URL: "",      // e.g. https://buy.stripe.com/xxxx
+    STRIPE_DONATE_MONTHLY_URL: "",   // optional recurring link (can be blank)
+
+    // EmailJS (create at https://www.emailjs.com/)
+    EMAILJS_PUBLIC_KEY: "",          // e.g. "aBcD123..."
+    EMAILJS_SERVICE_ID: "",          // e.g. "service_xxxxx"
+    EMAILJS_TEMPLATE_ID: ""          // e.g. "template_yyyyy"
+  };
+
+  /* ===== helpers ===== */
+  const $ = (s, r=document) => r.querySelector(s);
+  const $$ = (s, r=document) => [...r.querySelectorAll(s)];
+  const toast = $(".toast");
+
+  const showToast = (msg) => {
+    toast.textContent = msg;
+    toast.style.display = "block";
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(() => toast.style.display = "none", 2500);
+  };
+
+  /* ===== router (single file, multi-page feel) ===== */
+  const pages = ["home","about","keepsakes","donate","chapter","resources","testimonials","contact","request"];
+
+  function setActivePage(id, push=true){
+    pages.forEach(p => $("#page-"+p).classList.toggle("active", p===id));
+    $$("nav.links a[data-go]").forEach(a => a.classList.toggle("active", a.dataset.go===id));
+    if(push){
+      const url = new URL(location.href);
+      url.hash = "#"+id;
+      history.pushState({page:id}, "", url);
+    }
+    $("#main").scrollIntoView({behavior:"smooth", block:"start"});
+  }
+
+  $$("[data-go]").forEach(el => {
+    el.addEventListener("click", (e) => {
+      e.preventDefault();
+      const id = el.dataset.go;
+      if(pages.includes(id)) setActivePage(id, true);
+    });
+  });
+
+  window.addEventListener("popstate", (e) => {
+    const p = (e.state && e.state.page) || (location.hash || "#home").slice(1);
+    if(pages.includes(p)) setActivePage(p, false);
+  });
+
+  const initial = (location.hash || "#home").slice(1);
+  setActivePage(pages.includes(initial) ? initial : "home", false);
+
+  /* ===== accessibility toggles ===== */
+  const pref = JSON.parse(localStorage.getItem("tki_prefs") || "{}");
+  if(pref.highContrast) document.body.classList.add("high-contrast");
+  if(pref.readable) document.body.classList.add("readable");
+
+  $("#toggle-contrast").addEventListener("click", () => {
+    document.body.classList.toggle("high-contrast");
+    const p = JSON.parse(localStorage.getItem("tki_prefs") || "{}");
+    p.highContrast = document.body.classList.contains("high-contrast");
+    localStorage.setItem("tki_prefs", JSON.stringify(p));
+    showToast(p.highContrast ? "High contrast enabled" : "High contrast disabled");
+  });
+
+  $("#toggle-readable").addEventListener("click", () => {
+    document.body.classList.toggle("readable");
+    const p = JSON.parse(localStorage.getItem("tki_prefs") || "{}");
+    p.readable = document.body.classList.contains("readable");
+    localStorage.setItem("tki_prefs", JSON.stringify(p));
+    showToast(p.readable ? "Readable mode enabled" : "Readable mode disabled");
+  });
+
+  /* ===== donate links ===== */
+  const donateOnce = $("#donate-once");
+  const donateMonthly = $("#donate-monthly");
+  const donateStatus = $("#donate-status");
+
+  function configureDonate(){
+    if(CONFIG.STRIPE_DONATE_ONCE_URL){
+      donateOnce.href = CONFIG.STRIPE_DONATE_ONCE_URL;
+      donateOnce.target = "_blank";
+      donateOnce.rel = "noopener";
+      donateStatus.innerHTML = "<strong>Live:</strong> donation buttons open Stripe checkout (Visa supported).";
+    } else {
+      donateOnce.href = "#";
+      donateOnce.addEventListener("click", (e)=>{
+        e.preventDefault();
+        showToast("Add STRIPE_DONATE_ONCE_URL in CONFIG to go live.");
+      }, {once:true});
+      donateStatus.innerHTML = "<strong>Not live yet:</strong> paste your Stripe Payment Link in CONFIG.";
+    }
+
+    if(CONFIG.STRIPE_DONATE_MONTHLY_URL){
+      donateMonthly.href = CONFIG.STRIPE_DONATE_MONTHLY_URL;
+      donateMonthly.target = "_blank";
+      donateMonthly.rel = "noopener";
+      donateMonthly.style.display = "inline-flex";
+    } else {
+      donateMonthly.style.display = "none";
+    }
+  }
+  configureDonate();
+
+  /* ===== EmailJS setup ===== */
+  function emailJsReady(){
+    return CONFIG.EMAILJS_PUBLIC_KEY && CONFIG.EMAILJS_SERVICE_ID && CONFIG.EMAILJS_TEMPLATE_ID;
+  }
+
+  function initEmailJS(){
+    if(!window.emailjs) return;
+    if(emailJsReady()){
+      emailjs.init({ publicKey: CONFIG.EMAILJS_PUBLIC_KEY });
+    }
+  }
+  initEmailJS();
+
+  async function sendEmailFromForm(formEl){
+    // EmailJS sendForm requires a real configured template in your EmailJS dashboard.
+    return emailjs.sendForm(CONFIG.EMAILJS_SERVICE_ID, CONFIG.EMAILJS_TEMPLATE_ID, formEl);
+  }
+
+  function wireEmailForm(formId, resultId){
+    const form = $("#"+formId);
+    const result = $("#"+resultId);
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      // basic email validation
+      const emailField = form.querySelector('input[name="email"]');
+      const email = (emailField?.value || "").trim();
+      if(email && !/^\S+@\S+\.\S+$/.test(email)){
+        result.innerHTML = "<strong>Please enter a valid email address.</strong>";
+        showToast("Invalid email.");
+        return;
+      }
+
+      // if EmailJS not configured, show clear message
+      if(!emailJsReady()){
+        result.innerHTML = `
+          <strong>Not live yet.</strong><br/>
+          Paste your EmailJS Public Key, Service ID, and Template ID into the CONFIG section.
+        `;
+        showToast("Add EmailJS keys in CONFIG to go live.");
+        return;
+      }
+
+      try{
+        result.innerHTML = "Sending…";
+        await sendEmailFromForm(form);
+        result.innerHTML = "<strong>Sent.</strong> We’ll follow up as soon as possible.";
+        showToast("Message sent.");
+        form.reset();
+      }catch(err){
+        result.innerHTML = "<strong>Could not send.</strong> Please try again in a moment.";
+        showToast("Send failed (check EmailJS template settings).");
+      }
+    });
+  }
+
+  wireEmailForm("contact-form", "contact-result");
+  wireEmailForm("request-form", "request-result");
+
+  $("#year").textContent = new Date().getFullYear();
+})();
+</script>
+
+</body>
+</html>
